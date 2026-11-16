@@ -1,68 +1,91 @@
-# 🌱 Animal Crossing Turnip Market — GBM Simulator
+# Animal Crossing Turnip Market: A Geometric Brownian Motion Simulation
 
-A mathematical modelling project exploring the **Stalk Market** in *Animal Crossing: New Horizons* using **Geometric Brownian Motion (GBM)**.
+Can the Animal Crossing: New Horizons turnip market be modelled using mathematics from real-world financial markets?
 
-> An old Python project, originally developed for a mathematics exploration, revisited and rebuilt as I continue studying mathematics and programming.
+This project explores the game's unpredictable "Stalk Market" using Python, probability, statistics, and Geometric Brownian Motion (GBM). Using five weeks of recorded turnip prices, I investigated how a stochastic model could simulate price movements and what its predictions reveal about the risks of applying mathematical financial models to a fictional market.
 
-## Research question
+## Research Question
 
-**To what extent would the Animal Crossing “stalk” be successful and profitable in reality?**
+To what extent would the Animal Crossing "Stalk Market" be successful and profitable in reality?
 
-The original investigation collected five weeks of turnip prices, calculated rates of return and volatility, and used GBM to simulate possible future prices.
+## Motivation
 
-## 📊 Dataset
+During the 2020 lockdown, I became interested in the turnip market in Animal Crossing: New Horizons and its unpredictable prices. I wanted to explore whether this in-game market could be studied using the mathematical techniques used to model financial markets.
 
-The historical dataset contains 35 recorded prices across five weeks:
+This project began as a mathematical investigation and became an opportunity to explore programming, statistical analysis, probability distributions, and stochastic modelling.
 
-- 5 weekly buy prices
-- 30 daily sell prices
-- Prices range from **47 to 459 Bells**
-- The 459-Bell price is a major high-value outlier
+## What the Project Does
 
-The original report calculated a mean daily simple rate of return of approximately **14.29%** and volatility of approximately **84.46%**.
+- Organizes historical turnip-price data.
+- Calculates returns to investigate price changes.
+- Visualizes the distribution of historical log returns.
+- Simulates 10,000 possible final prices using GBM.
+- Compares mean and median simulated outcomes.
 
-## 🧮 The mathematics
 
-The project models prices with Geometric Brownian Motion:
+## Mathematical Model
+
+### Geometric Brownian Motion
+
+Geometric Brownian Motion (GBM) is a stochastic process used
+to model quantities that evolve over time with random changes.
+
+The continuous-time GBM model is:
 
 $$
-S_{t+\Delta t}
-=
-S_t
-\exp\left[
-(\mu-\frac12\sigma^2)\Delta t
-+
-\sigma\sqrt{\Delta t}Z
-\right]
+dS_t = \mu S_t\,dt + \sigma S_t\,dW_t
 $$
 
 where:
 
-- $S_t$ = current turnip price
-- $\mu$ = drift
-- $\sigma$ = volatility
-- $\Delta t$ = time step
-- $Z \sim N(0,1)$ = random shock
+- $S_t$ is the price at time $t$.
+- $\mu$ is the drift parameter.
+- $\sigma$ is the volatility parameter.
+- $W_t$ is a standard Brownian motion.
+- $dt$ represents a small time interval.
 
-The exponential form keeps simulated prices positive.
-
-### Returns
-
-For the original data, the simple rate of return is
+For simulation, the model can be written in discrete form:
 
 $$
-r = \frac{S_{sell}-S_{buy}}{S_{buy}}
+S_{t+\Delta t} =
+S_t \exp\left[
+\left(\mu-\frac{\sigma^2}{2}\right)\Delta t
++\sigma\sqrt{\Delta t}\,Z
+\right]
 $$
 
-and the logarithmic return is
+Here, $Z$ is a random variable drawn from a standard normal
+distribution, and $\Delta t$ is the time step.
+
+This equation ensures that simulated prices remain positive
+and incorporates random variation into each price change.
+
+### Parameter Estimation
+
+Let $r_t$ be a log return:
 
 $$
-r_{log}=\ln\left(\frac{S_{sell}}{S_{buy}}\right).
+r_t = \ln\left(\frac{S_t}{S_{t-1}}\right)
 $$
 
-The original investigation used these values to study the distribution and risk of the fictional market.
+For a time step of $\Delta t = 1$, the parameters are
+estimated using:
 
-## 💻 Project structure
+$$
+\hat{\sigma} = s_r
+$$
+
+$$
+\hat{\mu} = \bar{r} + \frac{1}{2}s_r^2
+$$
+
+where $\bar{r}$ is the sample mean of the log returns and
+$s_r$ is their sample standard deviation.
+
+These estimates are based on the observed data and are
+not guaranteed to describe future price movements accurately.
+
+## Project Structure
 
 ```text
 animal-crossing-turnip-gbm/
@@ -73,7 +96,8 @@ animal-crossing-turnip-gbm/
 │   └── daily_returns.csv
 ├── src/
 │   ├── gbm_simulation.py
-│   └── final_price_simulation.py
+│   ├── final_price_simulation.py
+│   └── LEGACY_NOTES.md
 └── results/
     ├── gbm_paths.png
     ├── log_returns.png
@@ -81,59 +105,87 @@ animal-crossing-turnip-gbm/
     └── summary.json
 ```
 
-## 🚀 Running the project
+## Getting Started
+
+### Requirements
+
+- Python 3
+- NumPy
+- Matplotlib
+- SciPy
+- Pandas
+
+### Installation
+
+Clone the repository and navigate into the project directory:
 
 ```bash
 git clone <your-repository-url>
 cd animal-crossing-turnip-gbm
+```
+
+Install the required libraries:
+
+```bash
 pip install -r requirements.txt
+```
+
+### Run the Simulations
+
+Run the GBM price-path simulation:
+
+```bash
 python src/gbm_simulation.py
+```
+
+Run the final-price distribution simulation:
+
+```bash
 python src/final_price_simulation.py
 ```
 
-## 🔬 Original investigation vs. revised version
+The scripts generate visualizations and numerical summaries of the simulations.
 
-The appendix of the original report used hard-coded values `mu = 0.1` and `sigma = 0.8`, while the report's analysis states approximately `mu = 0.14285112984` and `sigma = 0.844594157512`.
+## Visualizations
 
-The rebuilt version uses the values calculated from the collected daily returns (including the sample standard deviation used in the original analysis) and keeps the time units consistent.
+### Simulated Price Paths
 
-This is intentional: the GitHub version is a **reconstruction and extension**, not a claim that the original code was already structured this way.
+![GBM price paths](results/gbm_paths.png)
 
-## ⚠️ Limitations
+### Historical Log Returns
 
-GBM is a simplified stochastic model. The original investigation identified several limitations:
+![Historical log returns](results/log_returns.png)
 
-- The Animal Crossing market is not governed by the same mechanisms as real financial markets.
-- The observed turnip prices contain randomness that does not map cleanly onto human-driven markets.
-- The extremely high observed volatility is unrealistic for most real-world stocks.
-- GBM assumes constant volatility, while real markets can experience changing volatility and sudden jumps.
-- Five weeks of data is a very small dataset.
+### Simulated Final Prices
 
-Therefore, the simulations should be interpreted as **mathematical experiments**, not reliable financial predictions.
+![Final price distribution](results/final_price_distribution.png)
 
-## 🌷 Why this project?
+## Key Findings
 
-This project started from a simple question: *could the turnip market in Animal Crossing be treated like a real financial market?*
+The dataset contains 35 recorded prices across five weeks, ranging from 47 to 459 Bells. The unusually high observation of 459 Bells illustrates how a single extreme value can influence statistical analysis.
 
-It became an opportunity to connect a game I enjoyed with probability, statistics, stochastic processes, and programming. Revisiting it now lets me improve the implementation while understanding the mathematics much more deeply.
+The simulations demonstrate how randomness and volatility can produce a wide range of possible outcomes. However, simulated prices are model outputs, not predictions of what the game's prices will actually be.
 
-## 🔭 Future improvements
+## Limitations
 
-- Compare GBM against the actual in-game turnip price mechanics
-- Run Monte Carlo simulations for profit probabilities
-- Estimate the probability of exceeding a target selling price
-- Compare different selling strategies
-- Add confidence intervals
-- Build an interactive dashboard
-- Explore models that allow changing volatility or sudden price jumps
+- The dataset covers only five weeks and is too small to represent every possible price pattern.
+- Geometric Brownian Motion assumes a particular mathematical structure for price movements that may not reflect the game's actual mechanics.
+- The model's results depend on how drift and volatility are estimated.
+- The game's turnip prices are governed by game-specific patterns and rules rather than the same mechanisms as real financial markets.
+- A simulated price distribution does not, by itself, establish whether a trading strategy is profitable.
 
-## 🛠️ Technologies
+## Future Improvements
 
-- Python
-- NumPy
-- pandas
-- Matplotlib
-- SciPy
-- Probability & statistics
-- Stochastic modelling
-- Monte Carlo simulation
+- Compare simulated prices with the game's actual price patterns.
+- Investigate alternative methods of estimating drift and volatility.
+- Calculate the probability of finishing with a profit under clearly defined buying and selling assumptions.
+- Compare GBM with alternative stochastic models.
+- Expand the dataset and evaluate how the additional observations affect the results.
+
+## What I Learned
+
+This project allowed me to connect mathematical theory with programming by translating a stochastic process into a working simulation. It also highlighted the importance of understanding model assumptions, checking calculations, and distinguishing mathematical outputs from real-world conclusions.
+
+## Technologies
+
+Python · NumPy · Pandas · Matplotlib · SciPy

@@ -1,0 +1,10 @@
+{
+  "daily_drift_simple_return": 0.14285112984073084,
+  "daily_volatility_sample_std": 0.8445941574749389,
+  "historical_log_return_mean": -0.014019020778231488,
+  "historical_log_return_std_sample": 0.4991672362163794,
+  "simulation_mean_final_price": 1947.6912340539814,
+  "simulation_median_final_price": 0.06511969417695071,
+  "simulation_min_final_price": 1.3110103539635016e-10,
+  "simulation_max_final_price": 4252718.486319214
+}
